@@ -221,8 +221,7 @@ var TileGame = (function () {
             this.context.fillStyle = "#DD2222"
             this.context.fillText("Winner!", (this.width / 2) - 90, this.height / 2);
         }
-
-        window.requestAnimationFrame(this.draw.bind(this));
+		setTimeout(this.draw.bind(this),20);
     }
 
     // Checks if we have a winner yet by comparing slot order to tile source order
