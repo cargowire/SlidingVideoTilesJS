@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Video based TileGame demo</title>
+        <script type="text/javascript" src="TileGame.js"></script>
+        <style type="text/css">
+            * {
+                font-family:Arial, Helvetica;
+                color:#999;
+            }
+        </style>
+    </head>
+<body>
+    <h1>Video based TileGame demo</h1>
+
+	<video id="video" width="320" height="240" autoplay loop>
+  		<source src="/video.webm" type="video/webm"/>
+	</video>
+
+    <script type="text/javascript">
+        // DomReady
+        var myGame = new TileGame.Game(document.getElementById("video"), 3);
+    </script>
+
+</body>
+</html>
