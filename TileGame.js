@@ -36,10 +36,6 @@ var TileGame = (function () {
         {
             this.tile.draw(this.pixelX, this.pixelY);
         }
-
-        // Draw slot boundary
-        this.dest.rect(this.pixelX, this.pixelY, this.width, this.height);
-        this.dest.stroke();
     }
 
     // Slots can be clicked but only react if the click was within their bounds
@@ -63,9 +59,9 @@ var TileGame = (function () {
     };
 
     // Draws the tile in a specific place on screen
-    TileGame.Tile.prototype.draw = function (x, y) {
-        var iData = this.src.getImageData(this.x, this.y, this.width, this.height)
-        this.dest.putImageData(iData, x, y);
+    TileGame.Tile.prototype.draw = function (x, y)
+    {
+        this.dest.drawImage(this.src, this.x, this.y, this.width, this.height, x, y, this.width, this.height);
     }
 
     // Represents the game object which is initialized with a source video and a number
@@ -111,7 +107,7 @@ var TileGame = (function () {
                 var pixelX = ((tile % that.numberOfRows) * tileWidth);
                 var pixelY = Math.floor(tile / that.numberOfRows) * tileHeight;
 
-                that.tiles[tile] = new TileGame.Tile(that.backcontext, that.context, tile, pixelX, pixelY, tileWidth, tileHeight);
+                that.tiles[tile] = new TileGame.Tile(back, that.context, tile, pixelX, pixelY, tileWidth, tileHeight);
             }
 
             var shuffledTiles = that.tiles.slice(0);//.shuffle();
@@ -205,12 +201,32 @@ var TileGame = (function () {
 
         // First, draw it into the backing canvas
         this.context.clearRect(0, 0, this.width, this.height);
+        this.backcontext.clearRect(0, 0, this.width, this.height);
         this.backcontext.drawImage(this.videoElement, 0, 0, this.width, this.height);
 
-        for (var i = 0; i < this.slots.length; i++) {
+        // Draw the slots
+        for (var i = 0; i < this.slots.length; i++)
+        {
             this.slots[i].draw();
         }
 
+        // Draw the grid in one pass
+        var rows = Math.sqrt(this.slots.length);
+        var rowHeight = (this.height / rows);
+        var colWidth = (this.width / rows);
+        this.context.beginPath();
+        for(var i = 0; i <= rows; i++)
+        {
+            var yPos = Math.round(i * rowHeight);
+            var xPos = Math.round(i * colWidth);
+            this.context.moveTo(0, yPos);
+            this.context.lineTo(this.width, yPos);
+            this.context.moveTo(xPos, 0);
+            this.context.lineTo(xPos, this.height);
+        }
+        this.context.stroke();
+
+        // Draw win condition
         if (this.hasWon)
         {
             this.context.font = "40pt Arial, Helvetica";
@@ -222,7 +238,7 @@ var TileGame = (function () {
             this.context.fillText("Winner!", (this.width / 2) - 90, this.height / 2);
         }
 
-        window.requestAnimationFrame(this.draw.bind(this));
+        requestAnimationFrame(this.draw.bind(this));
     }
 
     // Checks if we have a winner yet by comparing slot order to tile source order
