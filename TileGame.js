@@ -91,6 +91,7 @@ var TileGame = (function () {
             that.width = back.width = display.width = videoElement.videoWidth;
             that.height = back.height = display.height = videoElement.videoHeight;
             display.style.width = "100%";
+            display.style.position = "relative";
             canvasWrapper.style.width = videoElement.width + 'px';
             canvasWrapper.style.height = videoElement.height + 'px';
 
@@ -132,10 +133,11 @@ var TileGame = (function () {
         // Pass clicks of the canvas through to the slots
         display.addEventListener('click', function (e)
         {
+            var scaledX = (videoElement.videoWidth / e.target.clientWidth) * e.layerX;
+            var scaledY = (videoElement.videoHeight / e.target.clientHeight) * e.layerY;
+            
             for (var slot = 0; slot < that.slots.length; slot++)
             {
-                var scaledX = (videoElement.videoWidth / e.srcElement.clientWidth) * e.layerX;
-                var scaledY = (videoElement.videoHeight / e.srcElement.clientHeight) * e.layerY;
                 if (that.slots[slot].hitTest(scaledX, scaledY) && that.canMove(that.slots[slot]))
                 {
                     var emptySlot = that.getEmptySlot();
