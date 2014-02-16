@@ -18,6 +18,18 @@ if (typeof (Array.prototype.shuffle) === "undefined") {
     }
 }
 
+// Shim layer frame rate
+if (typeof(window.requestAnimationFrame) === "undefined") 
+{
+  window.requestAnimationFrame = (function(){
+    return window.webkitRequestAnimationFrame ||
+      window.mozRequestAnimationFrame ||
+      function(callback){
+        window.setTimeout(callback, 1000 / 60);
+      };
+  })();
+}
+
 // TileGame module
 var TileGame = (function () {
 
@@ -90,8 +102,9 @@ var TileGame = (function () {
             // Set sizes to ensure proportional canvas at same size as the video source
             that.width = back.width = display.width = videoElement.videoWidth;
             that.height = back.height = display.height = videoElement.videoHeight;
-            display.style.width = "100%";
             display.style.position = "relative";
+            display.style.width = videoElement.width + 'px';
+            display.style.height = ((videoElement.width / videoElement.videoWidth) * videoElement.videoHeight) + "px";
             canvasWrapper.style.width = videoElement.width + 'px';
             canvasWrapper.style.height = videoElement.height + 'px';
 
@@ -133,8 +146,10 @@ var TileGame = (function () {
         // Pass clicks of the canvas through to the slots
         display.addEventListener('click', function (e)
         {
-            var scaledX = (videoElement.videoWidth / e.target.clientWidth) * e.layerX;
-            var scaledY = (videoElement.videoHeight / e.target.clientHeight) * e.layerY;
+            var layerY = e.pageY - display.getBoundingClientRect().top;
+            var layerX = e.pageX - display.getBoundingClientRect().left;
+            var scaledX = (videoElement.videoWidth / e.target.clientWidth) * layerX;
+            var scaledY = (videoElement.videoHeight / e.target.clientHeight) * layerY;
             
             for (var slot = 0; slot < that.slots.length; slot++)
             {
@@ -240,7 +255,7 @@ var TileGame = (function () {
             this.context.fillText("Winner!", (this.width / 2) - 90, this.height / 2);
         }
 
-        requestAnimationFrame(this.draw.bind(this));
+        window.requestAnimationFrame(this.draw.bind(this), 20);
     }
 
     // Checks if we have a winner yet by comparing slot order to tile source order
