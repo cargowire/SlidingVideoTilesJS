@@ -13,14 +13,40 @@
 <body>
     <h1>Video based TileGame demo</h1>
 
+    <p>
+        To start the game move a tile out and back again to initiate the first win condition (the video
+        starts in a win condition to make testing simpler).  The next click will randomise the tiles.
+    </p>
+
 	<video id="video" width="320" height="240" autoplay loop>
-  		<source src="/video.webm" type="video/webm"/>
+  		<source src="video.webm" type="video/webm"/>
 	</video>
+
+    <form>
+        <label for="videoupload">Choose a local file and if your browser supports it the video will begin playing:</label>
+        <input id="videoupload" type="file" accept="video/*" />
+    </form>
 
     <script type="text/javascript">
         // DomReady
-        var myGame = new TileGame.Game(document.getElementById("video"), 3);
-    </script>
+        var videoNode = document.getElementById("video");
+        var myGame = new TileGame.Game(videoNode, 3);
 
+        // Run local video
+        var swapVideo = function (event) {
+            var file = this.files[0];
+            var type = file.type;
+            if (videoNode.canPlayType(type) === 'no')
+            {
+                return;
+            }
+
+            var fileURL = URL.createObjectURL(file);
+            videoNode.src = fileURL;
+        }
+
+        var input = document.getElementById("videoupload");
+        input.addEventListener('change', swapVideo, false);
+    </script>
 </body>
 </html>
